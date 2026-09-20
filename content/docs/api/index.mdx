@@ -23,9 +23,8 @@ Cada requisição autenticada leva o token da sessão:
 Authorization: Bearer <token da sessão>
 ```
 
-A sessão nasce em `POST /v1/auth/login` ou `POST /v1/auth/signup` e vale por 30 dias. O painel
-guarda esse token em um cookie `HttpOnly` no servidor dele — o navegador nunca vê o token nem fala
-com a API. Veja [Autenticação](/api/autenticacao).
+A sessão vale por 30 dias. O painel guarda esse token em um cookie `HttpOnly` no servidor dele — o
+navegador nunca vê o token nem fala com a API.
 
 ## Erros
 

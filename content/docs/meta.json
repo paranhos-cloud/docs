@@ -14,13 +14,11 @@
     "plataforma/planos-e-limites",
     "---Referência da API---",
     "api/index",
-    "api/autenticacao",
     "api/projetos",
     "api/deploys",
     "api/dominios",
     "api/variaveis",
     "api/storage",
-    "api/logs",
-    "api/conta"
+    "api/logs"
   ]
 }
