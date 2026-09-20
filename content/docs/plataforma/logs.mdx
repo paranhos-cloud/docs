@@ -9,12 +9,15 @@ respondendo, quanto tempo leva e quais caminhos dão erro.
 ## O formato da linha
 
 ```txt
-GET /sobre 200 12ms ray=8f3c1b2a4d5e6f70
+GET /sobre 200 12ms requestId=8f3c1b2a4d5e6f70
 ```
 
-Método, caminho, código HTTP, tempo de resposta e o `ray` — o identificador da requisição na
-Cloudflare, útil para cruzar com os eventos da rede quando algo é bloqueado antes de chegar ao
-site.
+Método, caminho, código HTTP, tempo de resposta e o `requestId` — o identificador daquela
+requisição na rede da Paranhos. É por ele que o suporte encontra o que aconteceu com um acesso
+específico, então vale guardá-lo ao relatar um problema.
+
+O caminho é registrado sem a query string: o que vem depois do `?` não entra no log, porque URLs
+costumam carregar token de sessão, e-mail e outros dados de quem acessa.
 
 ## Níveis
 
@@ -31,8 +34,8 @@ mais recentes.
 
 ## Retenção
 
-Os registros ficam guardados por **7 dias**. Para analisar períodos maiores, exporte o que precisa
-antes desse prazo.
+Os registros ficam guardados por **7 dias**; depois disso são apagados. Ainda não existe exportação
+para guardar períodos maiores.
 
 <Callout type="info">
   Aqui estão os acessos ao site. O log do **build** fica na execução do GitHub Actions, com link na
