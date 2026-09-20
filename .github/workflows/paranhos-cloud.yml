@@ -1,0 +1,23 @@
+# Publica este repositório na Paranhos Cloud a cada push na branch main.
+# O build roda aqui, no GitHub Actions; só o resultado estático é enviado para a Paranhos.
+name: Paranhos Cloud
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: paranhos-cloud
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: paranhos-cloud/deploy-action@v1
