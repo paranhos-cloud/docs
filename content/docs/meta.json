@@ -1,3 +1,26 @@
 {
-  "pages": ["index", "comecar", "plataforma", "api"]
+  "pages": [
+    "index",
+    "---Começar---",
+    "comecar/publicar-arquivos",
+    "comecar/publicar-do-github",
+    "---Plataforma---",
+    "plataforma/frameworks",
+    "plataforma/deploys",
+    "plataforma/dominios",
+    "plataforma/variaveis-de-ambiente",
+    "plataforma/storage",
+    "plataforma/logs",
+    "plataforma/planos-e-limites",
+    "---Referência da API---",
+    "api/index",
+    "api/autenticacao",
+    "api/projetos",
+    "api/deploys",
+    "api/dominios",
+    "api/variaveis",
+    "api/storage",
+    "api/logs",
+    "api/conta"
+  ]
 }

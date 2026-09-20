@@ -2,6 +2,14 @@
 @import 'fumadocs-ui/css/neutral.css';
 @import 'fumadocs-ui/css/preset.css';
 
+/*
+ * The layout spans the window. By default it is capped and centered, which anchors the sidebar to
+ * the content instead of the window edge and leaves a dead strip on the left of wide screens.
+ */
+:root {
+  --fd-layout-width: 100%;
+}
+
 html {
   scrollbar-gutter: stable;
 }
