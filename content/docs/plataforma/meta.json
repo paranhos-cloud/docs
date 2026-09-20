@@ -1,5 +1,6 @@
 {
   "title": "Plataforma",
+  "defaultOpen": true,
   "pages": [
     "frameworks",
     "deploys",

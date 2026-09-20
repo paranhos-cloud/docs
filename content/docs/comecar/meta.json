@@ -1,4 +1,8 @@
 {
   "title": "Começar",
-  "pages": ["publicar-arquivos", "publicar-do-github"]
+  "defaultOpen": true,
+  "pages": [
+    "publicar-arquivos",
+    "publicar-do-github"
+  ]
 }
