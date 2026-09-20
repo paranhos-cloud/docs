@@ -99,6 +99,14 @@ branch configurada. O deploy aparece no histórico assim que o GitHub informa a 
 | Aceite a atualização do app no GitHub | O app pede a permissão **Actions: Read and write** para disparar builds. |
 | Nenhum repositório encontrado | Libere o repositório na instalação do app, em **Adicionar conta**. |
 
+## Quota de publicação
+
+O endereço que recebe os builds aceita, por repositório e por hora, até 60 pedidos de configuração,
+60 envios de build e 1.200 consultas de status — bem acima do que um repositório movimentado usa,
+já que cada build faz um pedido de configuração, um envio e no máximo 60 consultas enquanto espera.
+O limite existe para conter um workflow em laço, não o seu ritmo de trabalho. Ao estourar, a
+resposta é `429` e o passo falha com a mensagem explicando o que aconteceu.
+
 ## Limites de hoje
 
 - Uma branch por projeto, sem deploy de preview por pull request.
