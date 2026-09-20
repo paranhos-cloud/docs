@@ -17,14 +17,32 @@ como `prj_...` para projetos.
 
 ## Autenticação
 
-Cada requisição autenticada leva o token da sessão:
+A API é chamada com um **token de acesso** criado no painel. Não existe login pela API: o token é
+emitido uma vez, com um perfil de acesso definido, e acompanha cada requisição.
 
 ```http
-Authorization: Bearer <token da sessão>
+Authorization: Bearer <seu token>
 ```
 
-A sessão vale por 30 dias. O painel guarda esse token em um cookie `HttpOnly` no servidor dele — o
-navegador nunca vê o token nem fala com a API.
+### Perfil do token
+
+Ao criar um token você escolhe:
+
+- **Alcance** — a conta inteira ou apenas os projetos que você selecionar.
+- **Permissão** — somente leitura, ou leitura e escrita.
+- **Validade** — uma data de expiração, ou nenhuma, valendo até ser revogado.
+
+O valor completo aparece uma única vez, no momento da criação; depois disso o painel mostra apenas
+os últimos caracteres, para você identificar o token na lista. Guarde-o como guardaria uma senha:
+quem tem o token tem exatamente o acesso que o perfil dele descreve.
+
+### O que o perfil muda nas respostas
+
+- Token ausente, inválido ou revogado: `401` com `unauthorized`.
+- Token válido, mas sem a permissão necessária para a rota: `403` com `forbidden`.
+- Projeto fora do alcance do token: `404`, como qualquer projeto que não é da conta.
+
+Revogar um token no painel tem efeito imediato, sem precisar trocar os outros.
 
 ## Erros
 
@@ -47,9 +65,9 @@ Um erro sempre volta no mesmo formato, com mensagem pronta para mostrar ao usuá
 | Código | HTTP | Quando acontece |
 | --- | --- | --- |
 | `bad_request` | 400 | Requisição malformada. |
-| `unauthorized` | 401 | Sem token, token inválido ou sessão expirada. |
+| `unauthorized` | 401 | Sem token, ou token inválido, expirado ou revogado. |
 | `limit_reached` | 402 | O plano da conta não permite a ação. |
-| `forbidden` | 403 | Sem permissão para a ação. |
+| `forbidden` | 403 | O token não tem permissão para a ação. |
 | `not_found` | 404 | Recurso inexistente — ou de outra conta. |
 | `conflict` | 409 | Conflito, como um nome de projeto já usado. |
 | `payload_too_large` | 413 | Arquivo acima do limite. |
@@ -66,5 +84,5 @@ Um erro sempre volta no mesmo formato, com mensagem pronta para mostrar ao usuá
 
 - Respostas sem corpo usam `204`.
 - Criações devolvem `201` com o recurso criado.
-- A conta vem da sessão: nenhuma rota aceita um identificador de conta no corpo ou na URL.
+- A conta vem do token: nenhuma rota aceita um identificador de conta no corpo ou na URL.
 - Um projeto só responde para a conta dona dele.
