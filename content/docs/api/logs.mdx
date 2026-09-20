@@ -26,7 +26,8 @@ GET /v1/projects/{projectId}/logs?level=error&search=/checkout
 | `search` | trecho da mensagem, até 200 caracteres | vazio |
 
 São devolvidas até **500 linhas**, das mais antigas para as mais recentes dentro desse recorte. O
-nível vem do código HTTP: 2xx e 3xx são `info`, 4xx é `warn` e 5xx é `error`.
+nível vem do código HTTP: 2xx e 3xx são `info`, 4xx é `warn` e 5xx é `error`. A mensagem traz
+método, caminho, código, tempo de resposta e o identificador da requisição.
 
 Os registros ficam guardados por **7 dias**. O log de build não está aqui — ele fica na execução do
 GitHub Actions, cujo endereço vem em `buildUrl` no [deploy](/api/deploys).

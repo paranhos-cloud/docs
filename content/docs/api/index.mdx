@@ -66,13 +66,5 @@ Um erro sempre volta no mesmo formato, com mensagem pronta para mostrar ao usuá
 
 - Respostas sem corpo usam `204`.
 - Criações devolvem `201` com o recurso criado.
-- A conta usada é sempre a da sessão; nenhuma rota aceita um identificador de conta do cliente.
-- Toda rota de projeto (`/v1/projects/:projectId/...`) valida que o projeto pertence à conta antes
-  de qualquer outra coisa.
-
-## Rotas de serviço
-
-| Rota | Resposta |
-| --- | --- |
-| `GET /` | `{ "name": "Paranhos Cloud API", "version": "v1" }` |
-| `GET /health` | `{ "ok": true }` |
+- A conta vem da sessão: nenhuma rota aceita um identificador de conta no corpo ou na URL.
+- Um projeto só responde para a conta dona dele.
