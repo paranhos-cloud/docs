@@ -1,0 +1,79 @@
+---
+title: Variáveis de ambiente
+description: Criar, alterar, revelar e remover variáveis de um projeto.
+---
+
+## Listar
+
+```http
+GET /v1/projects/{projectId}/environment
+```
+
+```json
+[
+  {
+    "id": "env_...",
+    "projectId": "prj_...",
+    "key": "VITE_API_URL",
+    "value": "https://api.exemplo.com",
+    "sensitive": false,
+    "targets": ["production"],
+    "createdAt": "...",
+    "updatedAt": "..."
+  }
+]
+```
+
+Em variáveis sensíveis, `value` vem `null`: o valor só sai da plataforma quando explicitamente
+revelado.
+
+## Criar
+
+```http
+POST /v1/projects/{projectId}/environment
+```
+
+```json
+{
+  "key": "VITE_API_URL",
+  "value": "https://api.exemplo.com",
+  "sensitive": true,
+  "targets": ["production"]
+}
+```
+
+Responde `201`. Regras: a chave usa letras, números e `_`, sem começar por número (até 128
+caracteres); o valor vai até 8 KB; `targets` aceita `production`, `preview` e `development`, e
+precisa de pelo menos um. Sem informar, `sensitive` é `true` e `targets` é `["production"]`.
+
+## Alterar
+
+```http
+PATCH /v1/projects/{projectId}/environment/{variableId}
+```
+
+Aceita os mesmos campos da criação, em qualquer combinação.
+
+## Revelar o valor
+
+```http
+POST /v1/projects/{projectId}/environment/{variableId}/reveal
+```
+
+```json
+{ "value": "https://api.exemplo.com" }
+```
+
+## Remover
+
+```http
+DELETE /v1/projects/{projectId}/environment/{variableId}
+```
+
+Responde `204`.
+
+<Callout type="info">
+  As variáveis marcadas para `production` são entregues ao build do repositório no início da
+  execução do workflow. Alterar uma variável não republica o projeto — veja
+  [Variáveis de ambiente](/plataforma/variaveis-de-ambiente).
+</Callout>

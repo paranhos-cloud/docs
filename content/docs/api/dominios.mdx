@@ -1,0 +1,71 @@
+---
+title: Domínios
+description: Ligar um domínio próprio ao projeto, verificar o DNS e remover.
+---
+
+## Listar
+
+```http
+GET /v1/projects/{projectId}/domains
+```
+
+```json
+[
+  {
+    "id": "dom_...",
+    "projectId": "prj_...",
+    "hostname": "meusite.com.br",
+    "kind": "custom",
+    "status": "active",
+    "records": [],
+    "errorMessage": null,
+    "lastCheckedAt": "...",
+    "createdAt": "..."
+  }
+]
+```
+
+`kind` é `platform` (o `<slug>.paranhos.cloud`, criado junto com o projeto) ou `custom`.
+`status` é `pending`, `verifying`, `active` ou `error`.
+
+## Adicionar
+
+```http
+POST /v1/projects/{projectId}/domains
+```
+
+```json
+{ "hostname": "meusite.com.br" }
+```
+
+O endereço é normalizado: `https://`, caminho e ponto final são removidos. Responde `201` com o
+domínio e os registros a criar no DNS:
+
+```json
+{
+  "records": [
+    { "type": "CNAME", "name": "meusite.com.br", "value": "sites.paranhos.cloud" },
+    { "type": "TXT", "name": "_paranhos.meusite.com.br", "value": "paranhos-verify=..." }
+  ]
+}
+```
+
+## Verificar
+
+```http
+POST /v1/projects/{projectId}/domains/{domainId}/verify
+```
+
+Consulta o DNS, confere o TXT e o roteamento e pede a emissão do certificado — ou tenta de novo,
+quando a emissão anterior falhou. Devolve o domínio atualizado; `errorMessage` explica o que falta,
+inclusive quando registros `CAA` impedem a autoridade de emitir.
+
+Veja [Domínios](/plataforma/dominios) para o passo a passo no provedor de DNS.
+
+## Remover
+
+```http
+DELETE /v1/projects/{projectId}/domains/{domainId}
+```
+
+Responde `204`. O projeto volta a ser servido apenas pelo subdomínio da plataforma.

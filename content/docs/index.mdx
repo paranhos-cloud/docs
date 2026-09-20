@@ -1,0 +1,49 @@
+---
+title: Paranhos Cloud
+description: Publique sites e aplicações estáticas em minutos, com domínio próprio, HTTPS e deploy a cada push.
+---
+
+A Paranhos Cloud hospeda sites e aplicações front-end na borda da Cloudflare. Você entrega os
+arquivos de duas formas — enviando a pasta do projeto ou conectando um repositório do GitHub — e a
+plataforma cuida de publicação, endereço, certificado e histórico de versões.
+
+## Como funciona
+
+<Cards>
+  <Card title="Enviar arquivos" href="/comecar/publicar-arquivos">
+    Arraste a pasta ou o ZIP do projeto no painel. Serve para qualquer site estático, inclusive
+    HTML puro.
+  </Card>
+  <Card title="Conectar o GitHub" href="/comecar/publicar-do-github">
+    O build roda no GitHub Actions do seu repositório e só o resultado é enviado. Cada push na
+    branch publica uma versão nova.
+  </Card>
+</Cards>
+
+Todo projeto nasce com um endereço `seu-projeto.paranhos.cloud`, com HTTPS já ativo. Quando você
+liga um domínio próprio, ele passa a ser o endereço principal do projeto e o subdomínio continua
+funcionando.
+
+## O que a plataforma entende
+
+Sites HTML, React, Vue, Angular e Next.js exportado como estático são reconhecidos automaticamente,
+com comandos de instalação e build sugeridos a partir dos arquivos do projeto. Aplicações com
+servidor — Next.js com SSR e projetos Node.js — ainda não são publicadas; veja
+[Frameworks](/plataforma/frameworks).
+
+## Por onde começar
+
+<Cards>
+  <Card title="Domínio próprio" href="/plataforma/dominios">
+    DNS, verificação e certificado.
+  </Card>
+  <Card title="Variáveis de ambiente" href="/plataforma/variaveis-de-ambiente">
+    Valores que entram no build.
+  </Card>
+  <Card title="Deploys" href="/plataforma/deploys">
+    Etapas, histórico e novo deploy.
+  </Card>
+  <Card title="Planos e limites" href="/plataforma/planos-e-limites">
+    O que cada plano inclui.
+  </Card>
+</Cards>

@@ -1,0 +1,33 @@
+---
+title: Storage
+description: Arquivos guardados fora do deploy e servidos pelo endereço do projeto.
+---
+
+O Paranhos Storage guarda arquivos que não fazem parte do build: imagens enviadas depois da
+publicação, PDFs, planilhas, material que muda sem precisar de um deploy novo.
+
+## Enviar e organizar
+
+Em **Storage**, envie arquivos e organize em pastas. Cada arquivo tem uma chave — o caminho
+completo dentro do projeto, como `imagens/logo.png`.
+
+- Tamanho máximo por arquivo: **25 MB**.
+- O total ocupado conta para o limite de storage do seu plano.
+
+## Endereço público
+
+Os arquivos são servidos pelo mesmo endereço do site, sob o prefixo `_storage/`:
+
+```txt
+https://meu-site.paranhos.cloud/_storage/imagens/logo.png
+```
+
+Com domínio próprio ativo, use o seu domínio no lugar do subdomínio. Vale lembrar: o conteúdo é
+**público** para quem tiver o endereço.
+
+## Storage e deploy
+
+Um deploy novo substitui os arquivos do site, mas **não** mexe no storage. É por isso que ele serve
+bem para conteúdo que o time troca sem republicar o projeto.
+
+Apagar um arquivo é imediato e não tem desfazer — o endereço dele para de responder na hora.

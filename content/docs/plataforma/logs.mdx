@@ -1,0 +1,40 @@
+---
+title: Logs
+description: Registro dos acessos ao site publicado, com filtro por nível e busca.
+---
+
+Cada requisição atendida por um projeto vira uma linha de log. É o que mostra se uma página está
+respondendo, quanto tempo leva e quais caminhos dão erro.
+
+## O formato da linha
+
+```txt
+GET /sobre 200 12ms ray=8f3c1b2a4d5e6f70
+```
+
+Método, caminho, código HTTP, tempo de resposta e o `ray` — o identificador da requisição na
+Cloudflare, útil para cruzar com os eventos da rede quando algo é bloqueado antes de chegar ao
+site.
+
+## Níveis
+
+O nível vem do código da resposta:
+
+| Nível | Códigos |
+| --- | --- |
+| `info` | 2xx e 3xx |
+| `warn` | 4xx |
+| `error` | 5xx |
+
+Na página **Logs** você filtra por nível e busca por trecho do caminho. São exibidas as 500 linhas
+mais recentes.
+
+## Retenção
+
+Os registros ficam guardados por **7 dias**. Para analisar períodos maiores, exporte o que precisa
+antes desse prazo.
+
+<Callout type="info">
+  Aqui estão os acessos ao site. O log do **build** fica na execução do GitHub Actions, com link na
+  página do deploy — veja [Deploys](/plataforma/deploys).
+</Callout>

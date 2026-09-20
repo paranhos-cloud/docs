@@ -1,0 +1,12 @@
+{
+  "title": "Plataforma",
+  "pages": [
+    "frameworks",
+    "deploys",
+    "dominios",
+    "variaveis-de-ambiente",
+    "storage",
+    "logs",
+    "planos-e-limites"
+  ]
+}

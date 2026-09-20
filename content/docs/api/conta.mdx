@@ -1,0 +1,147 @@
+---
+title: Conta
+description: Perfil, senha, sessões, uso, plano e integração com o GitHub.
+---
+
+## Perfil
+
+```http
+PATCH /v1/account
+```
+
+```json
+{ "name": "Ana Paranhos" }
+```
+
+Devolve `user` e `account` atualizados.
+
+## Trocar a senha
+
+```http
+POST /v1/account/password
+```
+
+```json
+{ "currentPassword": "a senha atual", "newPassword": "a nova senha" }
+```
+
+Responde `204`.
+
+## Sessões
+
+```http
+GET /v1/account/sessions
+```
+
+```json
+[
+  {
+    "id": "ses_...",
+    "userAgent": "Mozilla/5.0 ...",
+    "createdAt": "...",
+    "lastSeenAt": "...",
+    "current": true
+  }
+]
+```
+
+```http
+DELETE /v1/account/sessions
+```
+
+Encerra todas as outras sessões e devolve quantas foram encerradas: `{ "revoked": 2 }`.
+
+## Uso
+
+```http
+GET /v1/usage
+```
+
+```json
+{
+  "periodStart": "2026-09-01T00:00:00.000Z",
+  "periodEnd": "2026-10-01T00:00:00.000Z",
+  "planId": "free",
+  "metrics": [
+    { "id": "projects", "used": 1, "limit": 1, "unit": "count", "applicable": true },
+    { "id": "compute", "used": 0, "limit": null, "unit": "minutes", "applicable": false }
+  ]
+}
+```
+
+Métricas: `projects`, `requests`, `storage`, `bandwidth`, `deployments`, `builds`, `buildMinutes` e
+`compute`. `limit: null` significa ilimitado, e `applicable: false` marca o que ainda não se aplica
+a nenhuma conta. O período acompanha o mês do calendário.
+
+## Plano
+
+```http
+GET /v1/billing
+```
+
+```json
+{
+  "subscription": {
+    "planId": "free",
+    "status": "active",
+    "currentPeriodStart": "...",
+    "currentPeriodEnd": "..."
+  },
+  "plans": [{ "id": "free", "name": "Free", "monthlyPriceCents": 0, "limits": {}, "highlights": [] }],
+  "checkoutAvailable": false
+}
+```
+
+`checkoutAvailable` fica `false` enquanto a troca de plano pelo painel não existir.
+
+## Integração com o GitHub
+
+```http
+GET /v1/integrations/github
+```
+
+```json
+{ "status": "connected", "demo": false, "accounts": [{ "login": "ana", "type": "user" }] }
+```
+
+`status` é `unavailable` (integração não configurada na plataforma), `disconnected` ou
+`connected`.
+
+```http
+POST /v1/integrations/github/connect
+```
+
+```json
+{ "mode": "install" }
+```
+
+Devolve `{ "url": "https://github.com/..." }`, para onde o usuário deve ser levado. `install` leva
+à instalação do app em uma conta ou organização; `authorize` apenas liga instalações que já
+existem.
+
+```http
+POST /v1/integrations/github/callback
+```
+
+```json
+{ "code": "...", "state": "...", "installationId": "12345678" }
+```
+
+Recebe o que o GitHub devolveu na volta e conclui a ligação. O `state` vale por 30 minutos.
+
+```http
+GET /v1/integrations/github/accounts/{login}/repositories
+```
+
+Lista os repositórios liberados naquela conta ou organização.
+
+```http
+POST /v1/integrations/github/analyze
+```
+
+```json
+{ "repository": "ana/meu-site", "branch": null }
+```
+
+Analisa o repositório sem importá-lo e devolve a branch usada, um nome sugerido e a detecção —
+mesmo formato de `detection` do envio de arquivos, descrito em [Projetos](/api/projetos).

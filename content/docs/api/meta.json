@@ -1,0 +1,14 @@
+{
+  "title": "API",
+  "pages": [
+    "index",
+    "autenticacao",
+    "projetos",
+    "deploys",
+    "dominios",
+    "variaveis",
+    "storage",
+    "logs",
+    "conta"
+  ]
+}

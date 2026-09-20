@@ -1,0 +1,80 @@
+---
+title: Visão geral da API
+description: Formato das requisições, autenticação, erros e convenções da API da Paranhos Cloud.
+---
+
+<Callout type="warn">
+  **A API ainda não é pública.** Hoje ela só é acessível pelo painel, que fala com ela por uma
+  ligação interna entre serviços — não existe endereço público nem emissão de tokens para quem está
+  de fora. Esta referência documenta o contrato atual, que é o mesmo que a versão pública vai
+  seguir. Enquanto isso, ela serve para entender o que a plataforma faz e o que esperar quando o
+  acesso for liberado.
+</Callout>
+
+## Formato
+
+Todas as rotas ficam sob o prefixo `/v1`, recebem e devolvem JSON em UTF-8. Datas seguem o formato
+ISO 8601 em UTC (`2026-09-20T14:35:12.000Z`). Identificadores são textos com prefixo por tipo,
+como `prj_...` para projetos.
+
+## Autenticação
+
+Cada requisição autenticada leva o token da sessão:
+
+```http
+Authorization: Bearer <token da sessão>
+```
+
+A sessão nasce em `POST /v1/auth/login` ou `POST /v1/auth/signup` e vale por 30 dias. O painel
+guarda esse token em um cookie `HttpOnly` no servidor dele — o navegador nunca vê o token nem fala
+com a API. Veja [Autenticação](/api/autenticacao).
+
+## Erros
+
+Um erro sempre volta no mesmo formato, com mensagem pronta para mostrar ao usuário:
+
+```json
+{
+  "error": {
+    "code": "validation_failed",
+    "message": "Revise os campos destacados.",
+    "fields": {
+      "name": "Use pelo menos 3 caracteres."
+    }
+  }
+}
+```
+
+`fields` só aparece quando o erro é de um campo específico do corpo enviado.
+
+| Código | HTTP | Quando acontece |
+| --- | --- | --- |
+| `bad_request` | 400 | Requisição malformada. |
+| `unauthorized` | 401 | Sem token, token inválido ou sessão expirada. |
+| `limit_reached` | 402 | O plano da conta não permite a ação. |
+| `forbidden` | 403 | Sem permissão para a ação. |
+| `not_found` | 404 | Recurso inexistente — ou de outra conta. |
+| `conflict` | 409 | Conflito, como um nome de projeto já usado. |
+| `payload_too_large` | 413 | Arquivo acima do limite. |
+| `validation_failed` | 422 | Campos inválidos. |
+| `not_available` | 501 | Recurso reconhecido, mas ainda não publicável. |
+| `internal_error` | 500 | Falha inesperada. |
+
+<Callout type="info">
+  Recursos de outra conta respondem `404`, nunca `403`: a API não revela que eles existem.
+</Callout>
+
+## Convenções
+
+- Respostas sem corpo usam `204`.
+- Criações devolvem `201` com o recurso criado.
+- A conta usada é sempre a da sessão; nenhuma rota aceita um identificador de conta do cliente.
+- Toda rota de projeto (`/v1/projects/:projectId/...`) valida que o projeto pertence à conta antes
+  de qualquer outra coisa.
+
+## Rotas de serviço
+
+| Rota | Resposta |
+| --- | --- |
+| `GET /` | `{ "name": "Paranhos Cloud API", "version": "v1" }` |
+| `GET /health` | `{ "ok": true }` |

@@ -1,0 +1,64 @@
+---
+title: Storage
+description: Listar, enviar, baixar e apagar arquivos do storage de um projeto.
+---
+
+## Listar
+
+```http
+GET /v1/projects/{projectId}/storage?prefix=imagens/
+```
+
+```json
+{
+  "prefix": "imagens/",
+  "folders": ["imagens/produtos"],
+  "objects": [
+    {
+      "id": "obj_...",
+      "projectId": "prj_...",
+      "key": "imagens/logo.png",
+      "name": "logo.png",
+      "folder": "imagens",
+      "size": 20480,
+      "contentType": "image/png",
+      "createdAt": "..."
+    }
+  ],
+  "totalBytes": 20480
+}
+```
+
+`prefix` navega pelas pastas; sem ele, a listagem começa na raiz do projeto.
+
+## Enviar
+
+```http
+PUT /v1/projects/{projectId}/storage?key=imagens/logo.png
+Content-Type: image/png
+```
+
+O corpo é o arquivo. Responde `201` com o objeto criado. Um arquivo vai até **25 MB**, e o total
+ocupado conta para o limite de storage do plano (`limit_reached` quando estoura).
+
+## Baixar
+
+```http
+GET /v1/projects/{projectId}/storage/{objectId}/content
+```
+
+Devolve o arquivo com o `content-type` original e `content-disposition: attachment`.
+
+Para uso no site, o arquivo também é servido publicamente pelo endereço do projeto:
+
+```txt
+https://meu-site.paranhos.cloud/_storage/imagens/logo.png
+```
+
+## Apagar
+
+```http
+DELETE /v1/projects/{projectId}/storage/{objectId}
+```
+
+Responde `204`. A remoção é imediata e não tem desfazer.

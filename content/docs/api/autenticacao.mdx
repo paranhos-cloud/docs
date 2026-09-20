@@ -1,0 +1,88 @@
+---
+title: Autenticação
+description: Criar conta, entrar, sair e recuperar a senha.
+---
+
+## Criar conta
+
+```http
+POST /v1/auth/signup
+```
+
+```json
+{
+  "name": "Ana Paranhos",
+  "email": "ana@exemplo.com",
+  "password": "uma senha forte"
+}
+```
+
+Responde `201` com a sessão criada:
+
+```json
+{
+  "user": { "id": "usr_...", "name": "Ana Paranhos", "email": "ana@exemplo.com", "createdAt": "..." },
+  "account": { "id": "acc_...", "name": "Ana Paranhos" },
+  "session": { "token": "...", "expiresAt": "2026-10-20T14:35:12.000Z" }
+}
+```
+
+## Entrar
+
+```http
+POST /v1/auth/login
+```
+
+```json
+{ "email": "ana@exemplo.com", "password": "uma senha forte" }
+```
+
+Mesma resposta do cadastro, com `200`. Guarde `session.token` no servidor e envie-o em
+`Authorization: Bearer <token>` nas próximas requisições.
+
+## Sessão atual
+
+```http
+GET /v1/auth/me
+```
+
+Devolve `user` e `account` da sessão. É a forma de conferir se um token ainda vale: token expirado
+responde `401` com `unauthorized`.
+
+## Sair
+
+```http
+POST /v1/auth/logout
+```
+
+Revoga o token enviado e responde `204`.
+
+## Recuperar a senha
+
+```http
+POST /v1/auth/password-reset
+```
+
+```json
+{ "email": "ana@exemplo.com" }
+```
+
+Responde `204` sempre — inclusive quando o e-mail não existe, para não revelar quem tem conta. Um
+link de redefinição é enviado por e-mail e vale por **1 hora**.
+
+```http
+POST /v1/auth/password-reset/confirm
+```
+
+```json
+{ "token": "<token do link>", "password": "a nova senha" }
+```
+
+Responde `204`. O token só pode ser usado uma vez.
+
+## Sobre as sessões
+
+- Duram **30 dias**.
+- Cada sessão registra o navegador que a criou, listado em `GET /v1/account/sessions`.
+- Para encerrar as outras sessões da conta, use `DELETE /v1/account/sessions` — veja
+  [Conta](/api/conta).

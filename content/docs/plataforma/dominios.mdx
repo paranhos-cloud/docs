@@ -1,0 +1,66 @@
+---
+title: Domínios
+description: Endereço na paranhos.cloud, domínio próprio, registros de DNS e emissão do certificado.
+---
+
+Todo projeto tem dois tipos de endereço: o **subdomínio da plataforma**, criado junto com o
+projeto, e os **domínios próprios** que você ligar a ele.
+
+## Subdomínio da plataforma
+
+É `<nome-do-projeto>.paranhos.cloud`, com HTTPS desde o primeiro deploy. Ele nunca deixa de
+funcionar, mesmo depois de um domínio próprio entrar no ar — serve para testar uma publicação sem
+mexer no domínio principal.
+
+## Domínio próprio
+
+Em **Domínios**, adicione o endereço que você quer usar (`meusite.com.br`, `blog.meusite.com.br`,
+`www.meusite.com.br`). A plataforma mostra dois registros para criar no seu provedor de DNS:
+
+| Tipo | Nome | Valor |
+| --- | --- | --- |
+| `CNAME` | o próprio domínio | `sites.paranhos.cloud` |
+| `TXT` | `_paranhos.<seu domínio>` | `paranhos-verify=<código do projeto>` |
+
+O `TXT` prova que o domínio é seu; o `CNAME` manda o tráfego para a Paranhos. Em domínios de raiz
+(`meusite.com.br`, sem subdomínio) a maioria dos provedores não aceita `CNAME` — nesse caso use o
+recurso equivalente do provedor (ALIAS, ANAME ou "CNAME flattening").
+
+Depois de criar os registros, clique em **Verificar DNS**. A verificação checa o TXT, checa o
+roteamento e pede o certificado.
+
+## Situações do domínio
+
+| Situação | Significado |
+| --- | --- |
+| Pendente | Os registros ainda não foram encontrados. A propagação de DNS pode levar minutos. |
+| Verificando | Registros encontrados; o certificado está sendo emitido. |
+| Ativo | Domínio no ar, com HTTPS. |
+| Erro | Algo impede a emissão. A mensagem explica o quê. |
+
+Quando um domínio próprio fica ativo, ele vira o **endereço principal** do projeto: é para ele que
+o botão **Visitar** leva e é ele que aparece abaixo do nome do projeto.
+
+## Registros CAA podem bloquear o certificado
+
+<Callout type="warn">
+  Se o seu domínio tem registros `CAA`, eles listam quais autoridades podem emitir certificados
+  para ele. Uma autoridade que não está na lista simplesmente não consegue emitir, e o domínio fica
+  preso em "Verificando".
+</Callout>
+
+Quando isso acontece, a plataforma mostra qual autoridade foi recusada. Adicione um `CAA` liberando
+essa autoridade no domínio de raiz — por exemplo:
+
+```txt
+meusite.com.br.  CAA  0 issue "ssl.com"
+```
+
+Se o seu provedor recusar um `CAA` no subdomínio por conflito com o `CNAME`, crie o registro no
+domínio de raiz: ele vale para os subdomínios. Depois, clique em **Verificar DNS** de novo para a
+emissão ser tentada outra vez.
+
+## Remover um domínio
+
+Remover devolve o projeto ao subdomínio da plataforma e cancela o certificado. O domínio em si
+continua seu — só deixa de apontar para a Paranhos.

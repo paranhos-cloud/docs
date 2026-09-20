@@ -1,0 +1,78 @@
+---
+title: Publicar enviando arquivos
+description: Suba a pasta ou o ZIP do projeto pelo painel e tenha o site no ar em poucos minutos.
+---
+
+É o caminho mais curto: você envia os arquivos que já estão prontos para servir, e a Paranhos
+publica. Nada é compilado aqui — se o projeto usa um framework, rode o build na sua máquina antes.
+
+## Passo a passo
+
+<Steps>
+
+<Step>
+
+### Crie o projeto
+
+No painel, abra **Novo projeto → Enviar arquivos**. Arraste a pasta do projeto ou um arquivo `.zip`.
+
+</Step>
+
+<Step>
+
+### Confira a detecção
+
+A plataforma lê o conteúdo enviado e sugere framework, diretório raiz e pasta de saída. Se o
+projeto é HTML puro, ela procura o `index.html` na raiz ou em `dist/`, `build/`, `out/` e
+`public/`.
+
+</Step>
+
+<Step>
+
+### Dê um nome
+
+O nome vira o endereço: `meu-site` fica em `meu-site.paranhos.cloud`. Use letras minúsculas,
+números e hífens, de 3 a 40 caracteres.
+
+</Step>
+
+<Step>
+
+### Publique
+
+A publicação leva alguns segundos. Quando terminar, o projeto aparece como **Online** e o endereço
+já responde com HTTPS.
+
+</Step>
+
+</Steps>
+
+## O que enviar
+
+Envie o **resultado do build**, não o código-fonte:
+
+| Projeto | Pasta a enviar | Comando que gera |
+| --- | --- | --- |
+| HTML / CSS / JS | a própria pasta do site | — |
+| React (Vite) | `dist/` | `npm run build` |
+| Vue (Vite) | `dist/` | `npm run build` |
+| Angular | `dist/<projeto>/browser/` | `ng build` |
+| Next.js estático | `out/` | `next build` com `output: "export"` |
+
+<Callout type="info">
+  Se você enviar o projeto inteiro sem a pasta de build, a Paranhos avisa qual pasta está faltando
+  e sugere importar o repositório do GitHub, onde o build roda sozinho.
+</Callout>
+
+## Limites do envio
+
+- Arquivo enviado: até **50 MB**.
+- Conteúdo descompactado: até **120 MB** e **5.000 arquivos**.
+- Um envio que não vira projeto é descartado depois de **24 horas**.
+
+## Publicar uma nova versão
+
+Na página do projeto, use **Novo deploy** e envie os arquivos atualizados. Cada publicação entra no
+histórico com um número sequencial, e a versão anterior continua registrada em
+[Deploys](/plataforma/deploys).

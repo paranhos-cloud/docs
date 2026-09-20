@@ -1,0 +1,38 @@
+---
+title: Variáveis de ambiente
+description: Valores guardados no painel e entregues ao build do projeto.
+---
+
+Variáveis de ambiente ficam em **Configurações → Variáveis**. Elas são gravadas cifradas e
+entregues ao build — não ao navegador de quem visita o site.
+
+## Como elas chegam no build
+
+Nos projetos conectados ao GitHub, o workflow pede as variáveis à Paranhos no início da execução e
+as exporta antes de rodar instalação e build. Valem as variáveis marcadas para **produção**.
+
+<Callout type="warn">
+  Em projetos estáticos, tudo o que o build embute no bundle vira código público. Frameworks só
+  expõem ao navegador as variáveis com prefixo (`VITE_`, `NEXT_PUBLIC_`), mas o valor vai no
+  arquivo final de qualquer forma. Não guarde aqui chaves que não podem ser lidas por quem abre o
+  site.
+</Callout>
+
+## Regras
+
+- **Chave**: letras, números e `_`, sem começar por número. Até 128 caracteres.
+- **Valor**: até 8 KB.
+- **Ambientes**: produção, preview ou desenvolvimento. Hoje só produção participa do build; os
+  outros ficam guardados para quando preview e ambiente local forem lançados.
+- Chaves repetidas no mesmo projeto não são aceitas.
+
+## Valores sensíveis
+
+Uma variável marcada como sensível não aparece na listagem: o painel mostra o valor mascarado e só
+o revela quando você pede explicitamente. Variáveis criadas durante a importação de um projeto já
+entram como sensíveis.
+
+## Quando o valor passa a valer
+
+No **próximo build**. Alterar uma variável não republica o projeto sozinho — use **Novo deploy**
+(ou faça um push) para o valor entrar no ar.

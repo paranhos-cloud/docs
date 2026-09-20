@@ -1,0 +1,90 @@
+---
+title: Deploys
+description: Histórico de publicações, detalhe de um deploy e disparo de um build novo.
+---
+
+## Listar
+
+```http
+GET /v1/projects/{projectId}/deployments
+```
+
+Devolve o histórico, do mais recente para o mais antigo:
+
+```json
+[
+  {
+    "id": "dpl_...",
+    "number": 7,
+    "status": "success",
+    "origin": "github",
+    "branch": "main",
+    "commitSha": "3f1c2ab",
+    "createdAt": "...",
+    "finishedAt": "..."
+  }
+]
+```
+
+`status`: `queued`, `building`, `deploying`, `success`, `failed` ou `canceled`.
+`origin`: `github`, `upload` ou `manual`.
+
+## Detalhe
+
+```http
+GET /v1/projects/{projectId}/deployments/{deploymentId}
+```
+
+Traz o deploy completo, com etapas e registros:
+
+```json
+{
+  "id": "dpl_...",
+  "projectId": "prj_...",
+  "number": 7,
+  "status": "success",
+  "origin": "github",
+  "framework": "react",
+  "branch": "main",
+  "commitSha": "3f1c2ab",
+  "commitMessage": "Ajusta a home",
+  "steps": [
+    { "id": "received", "status": "success", "startedAt": "...", "finishedAt": "...", "note": "34 arquivos" }
+  ],
+  "startedAt": "...",
+  "finishedAt": "...",
+  "durationMs": 48213,
+  "errorMessage": null,
+  "isActive": true,
+  "buildUrl": "https://github.com/ana/meu-site/actions/runs/123",
+  "logs": [{ "id": "1", "timestamp": "...", "level": "info", "message": "Publicando 34 arquivos" }]
+}
+```
+
+As etapas (`steps`) seguem a ordem `received`, `detect`, `install`, `build`, `runtime`, `publish`,
+cada uma com situação `pending`, `running`, `success` ou `error`.
+
+## Publicar arquivos enviados
+
+```http
+POST /v1/projects/{projectId}/deployments
+```
+
+```json
+{ "uploadId": "upl_..." }
+```
+
+Responde `201` com o deploy criado. O `uploadId` vem de `POST /v1/uploads` — veja
+[Projetos](/api/projetos).
+
+## Disparar o workflow do repositório
+
+```http
+POST /v1/projects/{projectId}/deployments/dispatch
+```
+
+Responde `202`, sem corpo. A Paranhos pede ao GitHub que execute o workflow na branch configurada;
+o deploy aparece na listagem quando o GitHub informa a execução.
+
+Erros esperados: o workflow ainda não existe na branch (falta o merge do pull request de
+configuração) ou o app do GitHub não tem a permissão de escrita em Actions.

@@ -1,0 +1,106 @@
+---
+title: Publicar do GitHub
+description: Conecte um repositório e publique uma versão nova a cada push, com o build rodando no GitHub Actions.
+---
+
+Nesse modo a Paranhos não clona nem guarda o seu código. O build roda no GitHub Actions do próprio
+repositório, com as configurações e as variáveis que estão no painel, e só a pasta de saída é
+enviada para a plataforma.
+
+## Passo a passo
+
+<Steps>
+
+<Step>
+
+### Conecte a conta do GitHub
+
+No painel, abra **Novo projeto → Importar do GitHub** e instale o app **Paranhos Cloud** na conta
+ou organização desejada. Você escolhe quais repositórios ficam visíveis — a Paranhos só enxerga os
+que você liberar.
+
+</Step>
+
+<Step>
+
+### Escolha o repositório
+
+A lista mostra os repositórios liberados na instalação. Ao escolher um, a plataforma lê a branch
+padrão e sugere framework, comandos e pasta de saída.
+
+</Step>
+
+<Step>
+
+### Importe o projeto
+
+Revise nome, comandos e variáveis de ambiente e confirme. A Paranhos abre um **pull request** no
+repositório adicionando `.github/workflows/paranhos-cloud.yml`.
+
+</Step>
+
+<Step>
+
+### Faça o merge do pull request
+
+Depois do merge, cada push na branch dispara o workflow e publica uma versão nova. O aviso de
+"falta um passo" some assim que o primeiro build chega.
+
+</Step>
+
+</Steps>
+
+## O workflow que é adicionado
+
+```yaml title=".github/workflows/paranhos-cloud.yml"
+name: Paranhos Cloud
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: paranhos-cloud
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: paranhos-cloud/deploy-action@v1
+```
+
+O que a action faz, nessa ordem: pede as configurações do projeto à Paranhos, prepara o Node
+(respeitando `.nvmrc` ou `.node-version`, senão Node 22), instala as dependências com o gerenciador
+do seu lockfile, roda o build e envia a pasta de saída.
+
+<Callout type="info">
+  **Nenhum segredo vai para o repositório.** O workflow se identifica com o token OIDC do próprio
+  GitHub Actions, que a Paranhos valida para saber de qual repositório, branch e execução o deploy
+  veio. É por isso que a permissão `id-token: write` é obrigatória.
+</Callout>
+
+## Publicar sem fazer push
+
+O botão **Novo deploy**, na página do projeto, dispara o mesmo workflow (`workflow_dispatch`) na
+branch configurada. O deploy aparece no histórico assim que o GitHub informa a execução.
+
+## Se algo não funcionar
+
+| Mensagem | O que fazer |
+| --- | --- |
+| Faça o merge do pull request | O workflow ainda não existe na branch; o disparo manual só funciona depois do merge. |
+| Aceite a atualização do app no GitHub | O app pede a permissão **Actions: Read and write** para disparar builds. |
+| Nenhum repositório encontrado | Libere o repositório na instalação do app, em **Adicionar conta**. |
+
+## Limites de hoje
+
+- Uma branch por projeto, sem deploy de preview por pull request.
+- O repositório precisa gerar arquivos estáticos. Next.js com servidor e projetos Node.js ainda não
+  são publicados — veja [Frameworks](/plataforma/frameworks).

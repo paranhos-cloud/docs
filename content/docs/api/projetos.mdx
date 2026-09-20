@@ -1,0 +1,159 @@
+---
+title: Projetos
+description: Criar, listar, alterar e remover projetos, e enviar arquivos para publicação.
+---
+
+## O recurso
+
+```json
+{
+  "id": "prj_...",
+  "name": "meu-site",
+  "slug": "meu-site",
+  "status": "online",
+  "framework": "react",
+  "domain": "meusite.com.br",
+  "url": "https://meusite.com.br",
+  "platformDomain": "meu-site.paranhos.cloud",
+  "source": {
+    "type": "github",
+    "repository": "ana/meu-site",
+    "branch": "main",
+    "setupPullRequestUrl": null
+  },
+  "settings": {
+    "rootDirectory": "",
+    "installCommand": "npm ci",
+    "buildCommand": "npm run build",
+    "outputDirectory": "dist"
+  },
+  "latestDeployment": { "id": "dpl_...", "number": 7, "status": "success", "origin": "github", "branch": "main", "commitSha": "...", "createdAt": "...", "finishedAt": "..." },
+  "activeDeploymentId": "dpl_...",
+  "createdAt": "...",
+  "updatedAt": "..."
+}
+```
+
+`domain` e `url` apontam para o domínio próprio quando existe um ativo; `platformDomain` é sempre o
+endereço `<slug>.paranhos.cloud`, que o projeto nunca perde.
+
+`status` pode ser `online`, `building`, `deploying`, `failed` ou `offline`. `framework` pode ser
+`html`, `react`, `vue`, `angular`, `nextjs` ou `nodejs`.
+
+## Listar
+
+```http
+GET /v1/projects
+```
+
+Devolve os projetos da conta.
+
+## Obter
+
+```http
+GET /v1/projects/{projectId}
+```
+
+## Conferir um nome
+
+```http
+GET /v1/projects/name-availability?name=meu-site
+```
+
+```json
+{ "available": true }
+```
+
+Quando o nome não serve, a resposta traz o motivo: `{ "available": false, "reason": "Este nome já
+está em uso." }`. Alguns nomes são reservados pela plataforma.
+
+O nome vira o subdomínio: 3 a 40 caracteres, letras minúsculas, números e hífens, sem hífen no
+começo ou no fim.
+
+## Criar
+
+```http
+POST /v1/projects
+```
+
+De um envio de arquivos:
+
+```json
+{
+  "name": "meu-site",
+  "framework": "react",
+  "rootDirectory": "",
+  "installCommand": null,
+  "buildCommand": null,
+  "outputDirectory": "dist",
+  "environment": [],
+  "source": { "type": "upload", "uploadId": "upl_..." }
+}
+```
+
+De um repositório:
+
+```json
+{
+  "name": "meu-site",
+  "framework": "react",
+  "outputDirectory": "dist",
+  "source": { "type": "github", "repository": "ana/meu-site", "branch": "main" }
+}
+```
+
+Responde `201` com o projeto. Quando a origem é um repositório, a Paranhos abre o pull request com
+o workflow e devolve o endereço dele em `source.setupPullRequestUrl`.
+
+Erros comuns: `limit_reached` quando o plano não permite mais projetos, `conflict` quando o nome já
+existe ou o repositório já está ligado a outro projeto, `not_available` quando o projeto não pode
+ser publicado nesta versão (Next.js com servidor, Node.js).
+
+## Alterar
+
+```http
+PATCH /v1/projects/{projectId}
+```
+
+Aceita, em qualquer combinação: `name`, `framework`, `rootDirectory`, `installCommand`,
+`buildCommand`, `outputDirectory` e `branch`. Mudanças de build valem no próximo deploy.
+
+## Remover
+
+```http
+DELETE /v1/projects/{projectId}
+```
+
+Responde `204`. Remove o site do ar, junto com deploys, domínios, variáveis e arquivos do storage.
+
+## Enviar arquivos
+
+```http
+POST /v1/uploads?name=projeto.zip
+Content-Type: application/zip
+```
+
+O corpo é o próprio arquivo `.zip`, sem multipart. Responde `201` com a análise:
+
+```json
+{
+  "uploadId": "upl_...",
+  "fileName": "projeto.zip",
+  "size": 1048576,
+  "fileCount": 34,
+  "suggestedName": "meu-site",
+  "detection": {
+    "framework": "react",
+    "evidence": ["vite.config.ts", "dist/index.html"],
+    "rootDirectory": "",
+    "installCommand": "npm ci",
+    "buildCommand": "npm run build",
+    "outputDirectory": "dist",
+    "deployable": true,
+    "blockedReason": null
+  }
+}
+```
+
+Use o `uploadId` para criar o projeto ou um deploy novo. Limites: 50 MB no arquivo, 120 MB
+descompactado, 5.000 arquivos; um envio não usado expira em 24 horas.

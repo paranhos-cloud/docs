@@ -1,0 +1,65 @@
+---
+title: Frameworks
+description: O que a Paranhos reconhece, como a detecção funciona e o que ainda não é publicado.
+---
+
+A Paranhos publica **saída estática**: HTML, CSS, JavaScript e assets servidos direto da borda. O
+framework importa para saber como gerar essa saída — e, no caso do GitHub, para rodar o build.
+
+## Suportados
+
+| Framework | Pasta de saída padrão | Detectado por |
+| --- | --- | --- |
+| HTML | a pasta enviada | `index.html` |
+| React | `dist/` (`build/` com Create React App) | `vite.config.*`, `react` ou `react-scripts` |
+| Vue | `dist/` | `vue` no `package.json` |
+| Angular | `dist/<projeto>/browser/` | `angular.json` ou `@angular/core` |
+| Next.js estático | `out/` | `next.config.*` com `output: "export"` |
+
+A pasta do Angular vem do próprio `angular.json`: a plataforma lê o `outputPath` do projeto e
+acrescenta `browser/`, como faz o builder `application`.
+
+## Ainda não suportados
+
+<Callout type="warn">
+  Aplicações com servidor não são publicadas nesta versão: **Next.js com SSR, rotas de API ou
+  middleware**, e **projetos Node.js** (Express, Fastify, Nest e afins). A detecção reconhece esses
+  projetos e explica o que falta em vez de publicar algo quebrado.
+</Callout>
+
+Para um projeto Next.js, o caminho é exportar como estático:
+
+```js title="next.config.js"
+const nextConfig = {
+  output: 'export',
+};
+
+export default nextConfig;
+```
+
+## Como a detecção funciona
+
+A plataforma lê a lista de arquivos e o `package.json` do projeto, nesta ordem: Next.js → Angular →
+Vue → React/Vite → Node.js → HTML. O gerenciador de pacotes vem do lockfile (`package-lock.json`,
+`pnpm-lock.yaml`, `yarn.lock` ou `bun.lockb`), e o comando de build vem do script `build` do
+projeto.
+
+Dois detalhes mudam conforme a origem:
+
+- **Envio de arquivos**: a pasta de build precisa vir pronta. Sem ela, a plataforma avisa qual
+  pasta falta.
+- **Repositório do GitHub**: o build roda no Actions, então basta o código-fonte.
+
+Tudo o que a detecção sugere é editável antes de importar e depois, em **Configurações** do
+projeto: diretório raiz (útil em monorepos), comando de instalação, comando de build e pasta de
+saída.
+
+## Como as URLs são resolvidas
+
+Para qualquer projeto, um caminho sem extensão tenta, nesta ordem, o arquivo exato, `caminho.html`
+e `caminho/index.html`. Um caminho terminado em `/` procura o `index.html` daquela pasta.
+
+Projetos **React, Vue e Angular** ainda ganham o fallback de SPA: se nada casar, a resposta é o
+`index.html` da raiz, para o roteador do navegador assumir. Sites HTML e Next.js exportado seguem o
+comportamento tradicional — nesses, um caminho inexistente devolve o seu `404.html`, se houver, ou
+a página de erro da plataforma.

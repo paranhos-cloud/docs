@@ -1,0 +1,55 @@
+---
+title: Deploys
+description: Como uma publicação acontece, o que cada etapa significa e como acompanhar o histórico.
+---
+
+Cada publicação vira um **deploy** numerado dentro do projeto. O deploy ativo é o que responde no
+endereço do projeto; os outros ficam no histórico com o resultado e os registros do que aconteceu.
+
+## De onde vem um deploy
+
+| Origem | Quando acontece |
+| --- | --- |
+| `upload` | Você enviou arquivos pelo painel. |
+| `github` | Um push na branch ou o botão **Novo deploy** disparou o workflow. |
+| `manual` | Publicação iniciada pela própria plataforma. |
+
+## Etapas
+
+A página do deploy mostra as etapas em ordem, cada uma com horário e uma nota curta:
+
+| Etapa | O que acontece |
+| --- | --- |
+| Recebido | Os arquivos chegaram à plataforma. |
+| Detecção | Framework, diretório raiz e pasta de saída confirmados. |
+| Instalação | Dependências instaladas (no GitHub Actions). |
+| Build | Comando de build executado (no GitHub Actions). |
+| Runtime | Configuração de como o site é servido, incluindo o fallback de SPA. |
+| Publicação | Arquivos enviados para a borda e endereço apontado para a nova versão. |
+
+Nas publicações por envio de arquivos, instalação e build não se aplicam: a saída já vem pronta.
+
+## Situações possíveis
+
+`queued`, `building`, `deploying`, `success`, `failed` e `canceled`. Enquanto um deploy não termina
+com sucesso, a versão anterior continua no ar — uma publicação que falha não derruba o site.
+
+## Histórico e registros
+
+Em **Deploys**, cada linha traz número, situação, origem, branch e commit. Abrindo um deploy, você
+vê as etapas, a mensagem de erro (quando houver) e o link para a execução no GitHub Actions, onde
+está o log completo do build.
+
+<Callout type="info">
+  O log de build fica no GitHub Actions do seu repositório. A Paranhos guarda o resumo das etapas e
+  a mensagem de erro; os registros de acesso ao site ficam em [Logs](/plataforma/logs).
+</Callout>
+
+## Publicar de novo
+
+- **Projetos de envio**: use **Novo deploy** e mande os arquivos novos.
+- **Projetos do GitHub**: **Novo deploy** executa o workflow outra vez na branch configurada, sem
+  precisar de um commit. Útil quando o build depende de algo externo ou quando você mudou uma
+  variável de ambiente.
+
+Mudar uma variável de ambiente **não** republica sozinho: o valor entra no próximo build.
