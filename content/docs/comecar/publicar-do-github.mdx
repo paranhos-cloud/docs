@@ -101,6 +101,18 @@ branch configurada. O deploy aparece no histórico assim que o GitHub informa a 
 | Aceite a atualização do app no GitHub | O app pede a permissão **Actions: Read and write** para disparar builds. |
 | Nenhum repositório encontrado | Libere o repositório na instalação do app, em **Adicionar conta**. |
 
+## Trocar a branch depois
+
+Em **Configurações → Git**, mude a **Branch principal**. Como o workflow só roda na branch que ele
+nomeia, a Paranhos abre um pull request **na nova branch** atualizando o workflow.
+
+Até o merge, nada muda: a branch atual continua publicando a cada push. O primeiro build vindo da
+nova branch completa a troca, e a partir dele só ela publica. Se a nova branch já tiver o workflow
+certo, a troca vale na hora, sem pull request.
+
+Depois da troca, o workflow que ficou na branch antiga ainda dispara a cada push nela, mas a
+Paranhos recusa o build. Pode apagar o arquivo `.github/workflows/paranhos-cloud.yml` de lá.
+
 ## Quota de publicação
 
 O endereço que recebe os builds aceita, por repositório e por hora, até 60 pedidos de configuração,
