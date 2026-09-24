@@ -1,0 +1,109 @@
+---
+title: Rotas
+description: Vários projetos no mesmo domínio, cada um no seu caminho. Disponível a partir do plano Pro.
+---
+
+Use vários projetos no mesmo domínio. Publique seu site, blog e painel separadamente, mantendo tudo
+em `seudominio.com`:
+
+| Endereço | Projeto |
+| --- | --- |
+| `seudominio.com/` | site |
+| `seudominio.com/blog` | blog |
+| `seudominio.com/painel` | painel |
+
+Cada projeto continua independente: tem seus próprios deploys, variáveis, logs e storage. Os
+projetos não precisam saber nada uns dos outros.
+
+## Criar um roteador
+
+Em **Rotas**, crie um roteador. Ele recebe um endereço na plataforma, como
+`meunegocio.paranhos.cloud`, para você testar antes de apontar o seu domínio. O nome do roteador
+pode mudar quando quiser; o endereço, não.
+
+Depois, adicione os **caminhos**: para cada um, escolha o projeto que abre ali. O caminho mais
+específico vence — com `/` e `/blog` configurados, `/blog/post` abre o blog e `/contato` abre o
+projeto em `/`. A comparação é por trecho inteiro: `/blog` não pega `/blogger`.
+
+Por fim, em **Domínios**, adicione o seu domínio ao roteador, com os mesmos registros de DNS de um
+projeto (veja [Domínios](/plataforma/dominios)). Um domínio que já está ativo num projeto pode ser
+movido para um roteador com **Usar em Rotas**, sem refazer o DNS nem o certificado.
+
+## Caminho base: o projeto precisa nascer sabendo onde vai morar
+
+Um projeto montado em `/blog` precisa ser **gerado** para esse caminho. Sem isso, o HTML pede
+`/assets/app.js` — e esse endereço pertence ao projeto em `/`, não ao blog. A Paranhos não reescreve
+o seu build; ela entrega o caminho para o build usar.
+
+Ao montar um projeto num caminho, ele vira o **caminho base** do projeto. Builds pelo GitHub
+recebem esse valor na variável `PARANHOS_BASE_PATH` (sem barra no final, como `/blog`). Uploads
+precisam ser gerados com o caminho antes do envio.
+
+**Vite (React, Vue):**
+
+```ts title="vite.config.ts"
+export default defineConfig({
+  base: process.env.PARANHOS_BASE_PATH ? `${process.env.PARANHOS_BASE_PATH}/` : "/",
+});
+```
+
+**Next.js (export estático):**
+
+```ts title="next.config.ts"
+const nextConfig = {
+  output: "export",
+  basePath: process.env.PARANHOS_BASE_PATH ?? "",
+};
+```
+
+**Angular:** use `ng build --base-href /blog/` como comando de build.
+
+**HTML puro:** use endereços relativos (`./style.css`) ou comece os absolutos com o caminho
+(`/blog/style.css`).
+
+### Mudar o caminho base exige um novo deploy
+
+Mudar o caminho não muda um build que já existe. Enquanto o deploy no ar tiver sido gerado para
+outro caminho, o caminho aparece como **Requer novo deploy** e não é servido — o endereço cai no que
+estiver em `/`. Quando um deploy gerado para o caminho certo for publicado, ele fica **Ativo**
+sozinho.
+
+Depois de cada deploy, a plataforma lê o `index.html` publicado e avisa se encontrar endereços fora
+do caminho base. É uma pista, não uma garantia: um link para `/contato` pode ser intencional, e
+endereços montados dentro de JavaScript ou CSS não são lidos.
+
+### Um caminho por projeto
+
+Um projeto pode estar em vários roteadores, sempre no mesmo caminho: `empresa1.com/blog` e
+`empresa2.com/blog` funcionam juntos; `empresa3.com/noticias` com o mesmo projeto, não, porque um
+mesmo build não serve dois caminhos base. O projeto continua abrindo no próprio subdomínio,
+com ou sem o caminho.
+
+## Os caminhos compartilham a mesma origem
+
+<Callout type="warn">
+  Para o navegador, `seudominio.com/`, `seudominio.com/blog` e `seudominio.com/painel` são o
+  **mesmo site**. Eles não ficam isolados uns dos outros.
+</Callout>
+
+- **localStorage e IndexedDB** são compartilhados entre todos os projetos do domínio.
+- **Cookies** também, a menos que usem `Path=/painel` — e mesmo assim são só uma barreira de
+  organização, não de segurança.
+- **Service Workers** precisam de escopo restrito ao próprio caminho (`/blog/`), senão um projeto
+  pode interceptar as requisições do outro.
+
+Monte no mesmo domínio só projetos em que você confia igualmente. Se equipes diferentes cuidam de
+`/app` e `/admin`, trate os dois como um único sistema do ponto de vista de segurança.
+
+## Endereços reservados
+
+Trechos que começam com `_` ou `.` são da plataforma e não podem ser caminho. O storage de cada
+projeto fica dentro do caminho dele: `seudominio.com/blog/_storage/foto.png` é um arquivo do
+storage do blog.
+
+## Plano
+
+Rotas está disponível a partir do plano **Pro** (2 roteadores) e no **Business** (10 roteadores).
+Se o plano deixar de incluir Rotas, todos os caminhos continuam funcionando por 14 dias. Depois
+disso, cada roteador serve só o que está em `/` — o endereço principal nunca sai do ar — e nada é
+apagado: com o plano de volta, tudo volta como estava.

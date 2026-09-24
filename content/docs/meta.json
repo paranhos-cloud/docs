@@ -8,6 +8,7 @@
     "plataforma/frameworks",
     "plataforma/deploys",
     "plataforma/dominios",
+    "plataforma/rotas",
     "plataforma/variaveis-de-ambiente",
     "plataforma/storage",
     "plataforma/logs",
