@@ -1,6 +1,6 @@
 ---
 title: Rotas
-description: Vários projetos no mesmo domínio, cada um no seu caminho. Disponível a partir do plano Pro.
+description: Vários projetos no mesmo domínio, cada um no seu caminho — inclusive aplicações hospedadas fora. Disponível a partir do plano Pro.
 ---
 
 Use vários projetos no mesmo domínio. Publique seu site, blog e painel separadamente, mantendo tudo
@@ -78,6 +78,64 @@ Um projeto pode estar em vários roteadores, sempre no mesmo caminho: `empresa1.
 `empresa2.com/blog` funcionam juntos; `empresa3.com/noticias` com o mesmo projeto, não, porque um
 mesmo build não serve dois caminhos base. O projeto continua abrindo no próprio subdomínio,
 com ou sem o caminho.
+
+## Endereço externo
+
+Um caminho também pode abrir uma aplicação hospedada **fora** da Paranhos — um blog em outro
+serviço, um sistema que você já tem rodando:
+
+| Endereço | Abre |
+| --- | --- |
+| `seudominio.com/` | projeto site (Paranhos) |
+| `seudominio.com/blog` | `https://meublog.outrahospedagem.com` |
+
+A Paranhos recebe a requisição, repassa para a aplicação e devolve a resposta. O visitante só vê
+`seudominio.com`. Funciona com qualquer método (formulários, APIs, login), e o que a aplicação
+responde conta nos requests e na transferência do seu plano.
+
+Em **Adicionar caminho**, escolha **Endereço externo** e informe o endereço com `https`.
+
+### Prove que o endereço é seu
+
+O caminho só entra no ar depois que você provar que controla a aplicação — sem isso, qualquer um
+poderia colocar o site de outra pessoa atrás do próprio domínio. Use **uma** das opções:
+
+- **Arquivo:** faça a aplicação responder em `https://<endereço>/.well-known/paranhos-origin.txt`
+  com a linha `paranhos-origin=<código>` mostrada no painel. Serve para qualquer hospedagem, inclusive
+  subdomínios como `meublog.vercel.app`.
+- **DNS:** crie um registro `TXT` em `_paranhos-origin.<endereço>` com o mesmo valor. Serve quando o
+  domínio da aplicação é seu.
+
+Depois clique em **Verificar**. A prova é conferida de novo uma vez por dia; se ela sumir, o
+caminho continua no ar por 7 dias e depois para.
+
+### A aplicação precisa saber que está em `/blog`
+
+Por padrão a aplicação recebe o caminho inteiro: `seudominio.com/blog/post` chega como
+`/blog/post`. É o jeito mais seguro, porque os links que ela gera já saem certos — configure o
+endereço público dela como `https://seudominio.com/blog` (no WordPress, `WP_HOME` e `WP_SITEURL`;
+no Ghost, `url`).
+
+A opção **Remover o caminho antes de enviar** faz `/blog/post` chegar como `/post`. Use só se a
+aplicação trabalha com links relativos: a Paranhos não reescreve HTML, CSS nem JavaScript. Ela
+ajusta apenas redirecionamentos (`Location`) e o `Domain` dos cookies, para que continuem no seu
+domínio.
+
+A aplicação recebe estes cabeçalhos: `X-Forwarded-Host` (seu domínio), `X-Forwarded-Proto`,
+`X-Forwarded-For` (o IP do visitante) e `X-Forwarded-Prefix` (o caminho, como `/blog`).
+
+### Limites
+
+- Só `https`, com nome de domínio público — nada de IP, `localhost` ou endereços da Paranhos.
+- A aplicação tem 30 segundos para responder; depois disso o visitante vê uma página de erro.
+- WebSockets ainda não passam pelo proxy.
+- Os acessos aparecem em **Logs dos endereços externos**, na página do roteador.
+
+<Callout type="warn">
+  Com **Enviar cookies** ligado (o padrão, necessário para login), a aplicação externa recebe os
+  cookies do domínio inteiro, inclusive os dos outros caminhos. Desligue se ela não precisa de
+  sessão.
+</Callout>
 
 ## Os caminhos compartilham a mesma origem
 
