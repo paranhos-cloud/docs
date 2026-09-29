@@ -29,6 +29,12 @@ recurso equivalente do provedor (ALIAS, ANAME ou "CNAME flattening").
 Depois de criar os registros, clique em **Verificar DNS**. A verificação checa o TXT, checa o
 roteamento e pede o certificado.
 
+<Callout type="warn">
+  Se o DNS do seu domínio está na Cloudflare, deixe o registro `CNAME` como **Somente DNS** (nuvem
+  cinza). Com o proxy ligado (nuvem laranja), o `CNAME` fica escondido, o domínio parece não apontar
+  para a Paranhos e a verificação falha. O certificado e o proxy ficam por nossa conta.
+</Callout>
+
 ## Situações do domínio
 
 | Situação | Significado |
